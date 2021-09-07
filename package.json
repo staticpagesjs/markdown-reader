@@ -1,0 +1,29 @@
+{
+  "name": "@static-pages/markdown-reader",
+  "version": "0.0.0",
+  "description": "Markdown reader for static pages.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/staticpagesjs/markdown-reader.git"
+  },
+  "keywords": [
+    "markdown",
+    "front-matter",
+    "static-pages",
+    "reader"
+  ],
+  "author": "László BULIK",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/staticpagesjs/markdown-reader/issues"
+  },
+  "homepage": "https://github.com/staticpagesjs/markdown-reader#readme",
+  "dependencies": {
+    "front-matter": "^4.0.2",
+    "glob": "^7.1.7"
+  }
+}

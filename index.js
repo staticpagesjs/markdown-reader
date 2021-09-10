@@ -4,34 +4,33 @@ const glob = require('glob');
 const frontmatter = require('front-matter');
 
 module.exports = {
-  default: options => ({
+  default: ({ cwd, pattern = '**/*.md', incremental, fstat } = {}) => ({
     [Symbol.iterator]() {
       let ibMinDate;
       let ibFilesetId;
       const ibStartDate = new Date();
-      const ibPath = typeof options.incremental === 'string' ? options.incremental : '.incremental';
-      if (options.incremental) {
+      const ibPath = typeof incremental === 'string' ? incremental : '.incremental';
+      if (incremental) {
         const ibState = fs.existsSync(ibPath) ? JSON.parse(fs.readFileSync(ibPath, 'utf-8')) : {};
-        ibFilesetId = path.join(options.cwd, options.pattern).replace(/\\/g, '/');
+        ibFilesetId = path.join(cwd, pattern).replace(/\\/g, '/');
         ibMinDate = ibState && ibState[ibFilesetId] ? new Date(ibState[ibFilesetId]) : null;
       }
 
-      const cwd = path.resolve(process.cwd(), options.cwd);
-      const files = glob.sync(options.pattern, { cwd: cwd, absolute: true });
-
+      const absCwd = path.resolve(process.cwd(), cwd);
+      const files = glob.sync(pattern, { cwd: absCwd, absolute: true });
       return {
         next() {
           let file;
-          let fstat = null; // cache fstat data if later used by options.fstat
+          let fstatInfo = null; // cache fstat data if later used by fstat
           do {
             file = files.pop();
-            if (options.incremental && file) {
-              fstat = fs.fstatSync(fs.openSync(file, 'r'));
+            if (incremental && file) {
+              fstatInfo = fs.fstatSync(fs.openSync(file, 'r'));
             }
-          } while (options.incremental && file && ibMinDate > fstat.mtime);
+          } while (incremental && file && ibMinDate > fstatInfo.mtime);
 
           if (!file) { // no more input
-            if (options.incremental) {
+            if (incremental) {
               const ibState = fs.existsSync(ibPath) ? JSON.parse(fs.readFileSync(ibPath, 'utf-8')) : {};
               ibState[ibFilesetId] = ibStartDate;
               fs.writeFileSync(ibPath, JSON.stringify(ibState, null, 2));
@@ -39,18 +38,18 @@ module.exports = {
             return { done: true };
           }
 
-          const relativePath = path.relative(cwd, file);
+          const relativePath = path.relative(absCwd, file);
           const extName = path.extname(file);
 
           const fm = frontmatter(fs.readFileSync(file, 'utf-8'));
           const data = {
             header: {
-              cwd: cwd,
+              cwd: absCwd,
               path: relativePath,
               dirname: path.dirname(relativePath),
               basename: path.basename(relativePath, extName),
               extname: extName,
-              ...(options.fstat && (fstat || fs.fstatSync(fs.openSync(file, 'r'))))
+              ...(fstat && (fstatInfo || fs.fstatSync(fs.openSync(file, 'r'))))
             },
             attr: fm.attributes,
             body: fm.body,

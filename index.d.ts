@@ -14,8 +14,8 @@ export declare interface Data {
     dirname: string;
     basename: string;
     extname: string;
-  } & Partial<fs.Stats>,
-  attr: { [key: string]: unknown },
+  } & Partial<fs.Stats>;
+  attr: { [key: string]: unknown };
   body: string;
 }
 

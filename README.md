@@ -3,7 +3,7 @@ Front matter style markdown reader. Reads every file matching a given pattern. P
 
 ## Usage
 ```js
-const reader = require('@static-pages/markdown-reader').default;
+import reader from '@static-pages/markdown-reader';
 
 const iterable = reader({
   cwd: '.',

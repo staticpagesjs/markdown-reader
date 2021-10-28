@@ -9,9 +9,11 @@ export interface Options {
   pattern?: string;
   incremental?: boolean;
   fstat?: boolean;
+  attrKey?: string;
+  bodyKey?: string;
 }
 
-export interface Data {
+export type Data<AttrKey extends string = 'attr', BodyKey extends string = 'body'> = {
   header: {
     cwd: string;
     path: string;
@@ -19,11 +21,13 @@ export interface Data {
     basename: string;
     extname: string;
   } & Partial<fs.Stats>;
-  attr: { [key: string]: unknown };
-  body: string;
-}
+} & (AttrKey extends '' ? {
+  [attr in AttrKey]: Record<string, unknown>;
+} : Record<string, unknown>) & {
+  [body in BodyKey]: string;
+};
 
-export default ({ cwd, pattern = '**/*.md', incremental, fstat }: Options = {}) => ({
+export default ({ cwd, pattern = '**/*.md', incremental, fstat, attrKey = 'attr', bodyKey = 'body' }: Options = {}) => ({
   [Symbol.iterator]() {
     const absCwd = path.resolve(process.cwd(), cwd);
     const files = glob.sync(pattern, { cwd: absCwd, absolute: true });
@@ -48,7 +52,7 @@ export default ({ cwd, pattern = '**/*.md', incremental, fstat }: Options = {}) 
         const relativePath = path.relative(absCwd, file);
         const extName = path.extname(file);
 
-        const fm = frontmatter(fs.readFileSync(file, 'utf-8'));
+        const fm = frontmatter<Record<string, unknown>>(fs.readFileSync(file, 'utf-8'));
         const data = {
           header: {
             cwd: absCwd,
@@ -58,9 +62,9 @@ export default ({ cwd, pattern = '**/*.md', incremental, fstat }: Options = {}) 
             extname: extName,
             ...(fstat && (incrementalHelper?.fstat || fs.fstatSync(fs.openSync(file, 'r'))))
           },
-          attr: fm.attributes,
-          body: fm.body,
-        };
+          ...(attrKey ? { [attrKey]: fm.attributes } : fm.attributes),
+          [bodyKey || 'body']: fm.body,
+        } as Data<typeof attrKey, typeof bodyKey>;
 
         return { value: data };
       }

@@ -27,7 +27,7 @@ export type Data<AttrKey extends string = 'attr', BodyKey extends string = 'body
   [body in BodyKey]: string;
 };
 
-export default ({ cwd, pattern = '**/*.md', incremental, fstat, attrKey = 'attr', bodyKey = 'body' }: Options = {}) => ({
+export default ({ cwd = 'pages', pattern = '**/*.md', incremental, fstat, attrKey = 'attr', bodyKey = 'body' }: Options = {}) => ({
   [Symbol.iterator]() {
     const absCwd = path.resolve(process.cwd(), cwd);
     const files = glob.sync(pattern, { cwd: absCwd, absolute: true });

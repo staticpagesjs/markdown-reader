@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as glob from 'glob';
+import glob from 'glob';
 import frontmatter from 'front-matter';
 import { IncrementalHelper } from '@static-pages/incremental';
 

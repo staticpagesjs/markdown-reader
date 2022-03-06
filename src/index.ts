@@ -17,7 +17,7 @@ export type Data<AttrKey extends string = 'attr', BodyKey extends string = 'body
 		[body in BodyKey]: string;
 	};
 
-export default ({ cwd = 'pages', pattern = '**/*.yaml', incremental = false, attrKey = '', bodyKey = 'body' }: Options = {}) => ({
+export default ({ cwd = 'pages', pattern = '**/*.md', incremental = false, attrKey = '', bodyKey = 'body' }: Options = {}) => ({
 	*[Symbol.iterator]() {
 		for (const raw of reader({ cwd, pattern, incremental })) {
 			const fmData = frontmatter<Record<string, unknown>>(raw.body);

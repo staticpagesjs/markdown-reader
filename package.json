@@ -39,12 +39,10 @@
   },
   "homepage": "https://github.com/staticpagesjs/markdown-reader#readme",
   "dependencies": {
-    "@static-pages/incremental": "0.0.1",
-    "front-matter": "^4.0.2",
-    "glob": "^7.1.7"
+    "@static-pages/file-reader": "^1.0.1",
+    "front-matter": "^4.0.2"
   },
   "devDependencies": {
-    "@types/glob": "^7.1.4",
     "@types/node": "^16.9.3",
     "@typescript-eslint/eslint-plugin": "^5.3.0",
     "@typescript-eslint/parser": "^5.3.0",

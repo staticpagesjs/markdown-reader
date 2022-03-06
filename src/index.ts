@@ -1,73 +1,31 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import glob from 'glob';
 import frontmatter from 'front-matter';
-import { IncrementalHelper } from '@static-pages/incremental';
+import reader, { Options as ReaderOptions, Data as ReaderData } from '@static-pages/file-reader';
 
 export interface Options {
-  cwd?: string;
-  pattern?: string;
-  incremental?: boolean;
-  fstat?: boolean;
-  attrKey?: string;
-  bodyKey?: string;
+	cwd?: ReaderOptions['cwd'];
+	pattern?: ReaderOptions['pattern'];
+	incremental?: ReaderOptions['incremental'];
+	attrKey?: string;
+	bodyKey?: string;
 }
 
-export type Data<AttrKey extends string = 'attr', BodyKey extends string = 'body'> = {
-  header: {
-    cwd: string;
-    path: string;
-    dirname: string;
-    basename: string;
-    extname: string;
-  } & Partial<fs.Stats>;
-} & (AttrKey extends '' ? {
-  [attr in AttrKey]: Record<string, unknown>;
-} : Record<string, unknown>) & {
-  [body in BodyKey]: string;
-};
+export type Data<AttrKey extends string = 'attr', BodyKey extends string = 'body'> = Pick<ReaderData, 'header'> & (
+	AttrKey extends ''
+	? Record<string, unknown>
+	: { [attr in AttrKey]: Record<string, unknown>; }
+) & {
+		[body in BodyKey]: string;
+	};
 
-export default ({ cwd = 'pages', pattern = '**/*.md', incremental, fstat, attrKey = '', bodyKey = 'body' }: Options = {}) => ({
-	[Symbol.iterator]() {
-		const absCwd = path.resolve(process.cwd(), cwd);
-		const files = glob.sync(pattern, { cwd: absCwd, absolute: true });
-
-		const incrementalHelper = incremental ? new IncrementalHelper(
-			path.join(cwd, pattern).replace(/\\/g, '/'),
-			typeof incremental === 'string' ? incremental : '.incremental'
-		) : null;
-
-		return {
-			next() {
-				let file: string;
-				do {
-					file = files.pop();
-				} while (file && !(incrementalHelper?.isNew(file) ?? true));
-
-				if (!file) { // no more input
-					incrementalHelper?.finalize();
-					return { done: true };
-				}
-
-				const relativePath = path.relative(absCwd, file);
-				const extName = path.extname(file);
-
-				const fm = frontmatter<Record<string, unknown>>(fs.readFileSync(file, 'utf-8'));
-				const data = {
-					header: {
-						cwd: absCwd,
-						path: relativePath,
-						dirname: path.dirname(relativePath),
-						basename: path.basename(relativePath, extName),
-						extname: extName,
-						...(fstat && (incrementalHelper?.fstat || fs.fstatSync(fs.openSync(file, 'r'))))
-					},
-					...(attrKey ? { [attrKey]: fm.attributes } : fm.attributes),
-					[bodyKey || 'body']: fm.body,
-				} as Data<typeof attrKey, typeof bodyKey>;
-
-				return { value: data };
-			}
-		};
+export default ({ cwd = 'pages', pattern = '**/*.yaml', incremental = false, attrKey = '', bodyKey = 'body' }: Options = {}) => ({
+	*[Symbol.iterator]() {
+		for (const raw of reader({ cwd, pattern, incremental })) {
+			const fmData = frontmatter<Record<string, unknown>>(raw.body);
+			yield {
+				header: raw.header,
+				...(attrKey ? { [attrKey]: fmData.attributes } : fmData.attributes),
+				[bodyKey]: fmData.body,
+			};
+		}
 	}
 });

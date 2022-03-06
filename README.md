@@ -38,7 +38,6 @@ const iterable = reader({
 #### `Options`
 - `options.cwd` (default: `process.cwd()`) sets the current working directory.
 - `options.pattern` (default: `**/*.md`) a glob pattern that marks the files to read.
-- `options.attrKey` (default: (empty)) contents of the yaml segment will be put under this key in the returned data object to prevent polluting the root level (eg. prevent the overwrite of the header or body field). When left empty the contents are put to the root level.
 - `options.attrKey` (default: (empty)) file contents will be put under this key in the returned data object to prevent polluting the root (eg. prevent the overwrite of the header field). When left empty the contents are spread into the root object.
 - `options.bodyKey` (default: `body`) markdown body text will be presented under this key. This allow you to give a better matching key for the markdown body if it helps your workflow.
 - `options.incremental` (default: `false`) enables the incremental build. See more at [@static-pages/file-reader docs page](https://www.npmjs.com/package/@static-pages/file-reader#Incremental-builds).

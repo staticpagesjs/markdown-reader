@@ -1,5 +1,5 @@
 import frontmatter from 'front-matter';
-import reader, { FileReaderOptions, FileReaderData } from '@static-pages/file-reader';
+import { fileReader, FileReaderOptions, FileReaderData } from '@static-pages/file-reader';
 
 export interface Options {
 	cwd?: FileReaderOptions['cwd'];
@@ -19,7 +19,7 @@ export type Data<AttrKey extends string = 'attr', BodyKey extends string = 'body
 
 export const markdownReader = ({ cwd = 'pages', pattern = '**/*.md', incremental = false, attrKey = '', bodyKey = 'body' }: Options = {}) => ({
 	*[Symbol.iterator]() {
-		for (const raw of reader({ cwd, pattern, incremental })) {
+		for (const raw of fileReader({ cwd, pattern, incremental })) {
 			const fmData = frontmatter<Record<string, unknown>>(raw.body);
 			yield {
 				header: raw.header,

@@ -1,7 +1,9 @@
 /tsconfig.json
+/tsconfig.cjs.json
+/.travis.yml
 /.eslintrc.cjs
-/src/
 /tests/
-.incremental
-*.tgz
+/src/
+/coverage/
 *.log
+*.tgz

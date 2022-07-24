@@ -1,4 +1,4 @@
-const reader = require('../cjs/index').default;
+import reader from '../esm/index.js';
 
 test('it can use @static-pages/file-reader', async () => {
 	const expected = ['file1', 'file2', 'file3'];

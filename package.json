@@ -39,7 +39,7 @@
   },
   "homepage": "https://github.com/staticpagesjs/markdown-reader#readme",
   "dependencies": {
-    "@static-pages/file-reader": "^2.0.0",
+    "@static-pages/file-reader": "^3.0.0",
     "front-matter": "^4.0.2"
   },
   "devDependencies": {
